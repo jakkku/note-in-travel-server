@@ -7,8 +7,8 @@ const logger = require("morgan");
 const createError = require("http-errors");
 const cookieParser = require("cookie-parser");
 
-const indexRouter = require("./routes/index");
-const usersRouter = require("./routes/users");
+const db = require("./config/db");
+const auth = require("./routes/auth");
 
 const app = express();
 
@@ -19,21 +19,21 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use("/", indexRouter);
-app.use("/users", usersRouter);
+db.init();
+
+app.use("/auth", auth);
 
 app.use((req, res, next) => {
-  next(createError(404));
+  next(createError(404, "Not Found Page"));
 });
 
 app.use((err, req, res, next) => {
-  res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
 
   res.status(err.status || 500);
   res.json({
     ok: false,
-    error: err,
+    error: { message: err.message },
   });
 });
 
