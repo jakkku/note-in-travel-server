@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const defaultPhoto = "https://cdn.pixabay.com/photo/2018/04/18/18/56/user-3331257__340.png";
+const defaultPhotoUrl = "https://cdn.pixabay.com/photo/2018/04/18/18/56/user-3331257__340.png";
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -13,9 +13,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     requiredL: [true, "name is required"],
   },
-  photo: {
+  photoUrl: {
     type: String,
-    default: defaultPhoto,
+    default: defaultPhotoUrl,
   },
   favoriteCourses: [{
     type: mongoose.Types.ObjectId,
