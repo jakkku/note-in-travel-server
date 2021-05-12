@@ -11,8 +11,11 @@ const courseSchema = new mongoose.Schema({
   },
   name: String,
   sites: [{
-    type: mongoose.Types.ObjectId,
-    ref: "Site",
+    index: Number,
+    site: {
+      type: mongoose.Types.ObjectId,
+      ref: "Site",
+    },
   }],
   messages: [{
     type: mongoose.Types.ObjectId,
