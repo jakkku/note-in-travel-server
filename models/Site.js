@@ -1,11 +1,20 @@
 const mongoose = require("mongoose");
 
 const siteSchema = new mongoose.Schema({
-  name: {
+  fullName: {
     type: String,
-    required: [true, "name is required"],
+    required: [true, "full name is required"],
   },
-  location: [Number, Number],
+  shortName: {
+    type: String,
+    required: [true, "short name is required"],
+  },
+  region: {
+    latitude: Number,
+    longitude: Number,
+    latitudeDelta: Number,
+    longitudeDelta: Number,
+  },
   category: {
     type: String,
     enum: [
