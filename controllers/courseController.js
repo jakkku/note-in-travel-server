@@ -7,18 +7,17 @@ const catchAsync = require("../utils/catchAsync");
 
 exports.addCourse = catchAsync(async (req, res, next) => {
   const { _id: userId } = req.user;
-  const course = req.body;
+  const schedules = req.body;
   const session = await mongoose.startSession();
 
   try {
     session.startTransaction();
 
-    const convertedCourse = await Promise.all(course.map(async (site) => {
+    const convertedSchedules = await Promise.all(schedules.map(async ({ index, site }) => {
       const {
         fullName,
         shortName,
         region,
-        index,
       } = site;
       let siteInDB = await Site.findOne({ fullName }, null, { session });
 
@@ -33,7 +32,7 @@ exports.addCourse = catchAsync(async (req, res, next) => {
 
     const [newCourse] = await Course.create([{
       creator: userId,
-      sites: convertedCourse,
+      schedules: convertedSchedules,
     }], { session });
 
     await User.findByIdAndUpdate(
@@ -71,7 +70,7 @@ exports.getCourseById = catchAsync(async (req, res, next) => {
     return next(new Error("404"));
   }
 
-  course.sites.length > 0 && course.populate("sites.site");
+  course.schedules.length > 0 && course.populate("schedules.site");
   course.messages.length > 0 && course.populate("messages");
 
   await course.populate("creator").execPopulate();
