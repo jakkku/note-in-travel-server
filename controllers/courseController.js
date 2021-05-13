@@ -51,3 +51,29 @@ exports.addCourse = catchAsync(async (req, res, next) => {
     next(err);
   }
 });
+
+exports.getCourseById = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+
+  if (!mongoose.isValidObjectId(id)) {
+    // TODO: add error object creator
+    return next(new Error("404"));
+  }
+
+  const course = await Course.findById(id);
+
+  if (!course) {
+    // TODO: add error object creator
+    return next(new Error("404"));
+  }
+
+  course.sites.length > 0 && course.populate("sites.site");
+  course.messages.length > 0 && course.populate("messages");
+
+  await course.populate("creator").execPopulate();
+
+  return res.json({
+    ok: true,
+    data: course,
+  });
+});
