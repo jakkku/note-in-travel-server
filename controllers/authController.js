@@ -18,6 +18,8 @@ exports.login = catchAsync(async (req, res, next) => {
     { expiresIn: "6h" },
   );
 
+  await user.populate("myCourses").execPopulate();
+
   res.json({
     ok: true,
     data: { user, token },
