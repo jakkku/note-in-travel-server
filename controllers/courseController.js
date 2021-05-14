@@ -7,7 +7,7 @@ const catchAsync = require("../utils/catchAsync");
 
 exports.addCourse = catchAsync(async (req, res, next) => {
   const { _id: userId } = req.user;
-  const schedules = req.body;
+  const { name, schedules } = req.body;
   const session = await mongoose.startSession();
 
   try {
@@ -31,6 +31,7 @@ exports.addCourse = catchAsync(async (req, res, next) => {
     }));
 
     const [newCourse] = await Course.create([{
+      name,
       creator: userId,
       schedules: convertedSchedules,
     }], { session });
