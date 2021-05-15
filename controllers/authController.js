@@ -15,8 +15,11 @@ exports.login = catchAsync(async (req, res, next) => {
   const token = jwt.sign(
     { id: user._id },
     process.env.JWT_SECRET_KEY,
-    { expiresIn: "6h" },
+    // TODO: ON expiresIn option
+    // { expiresIn: "6h" },
   );
+
+  await user.populate("myCourses").execPopulate();
 
   res.json({
     ok: true,

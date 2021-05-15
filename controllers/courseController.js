@@ -7,29 +7,33 @@ const catchAsync = require("../utils/catchAsync");
 
 exports.addCourse = catchAsync(async (req, res, next) => {
   const { _id: userId } = req.user;
-  const course = req.body;
+  const { name, schedules } = req.body;
   const session = await mongoose.startSession();
 
   try {
     session.startTransaction();
 
-    const convertedCourse = await Promise.all(course.map(async (site) => {
-      let siteInDB = await Site.findOne({ fullName: site.fullName }, null, { session });
+    const convertedSchedules = await Promise.all(schedules.map(async ({ index, site }) => {
+      const {
+        fullName,
+        shortName,
+        region,
+      } = site;
+      let siteInDB = await Site.findOne({ fullName }, null, { session });
 
       if (siteInDB) {
-        return { index: site.index, site: siteInDB._id };
+        return { index, site: siteInDB._id };
       }
-
-      const { fullName, shortName, region } = site;
 
       [siteInDB] = await Site.create([{ fullName, shortName, region }], { session });
 
-      return { index: site.index, site: siteInDB._id };
+      return { index, site: siteInDB._id };
     }));
 
     const [newCourse] = await Course.create([{
+      name,
       creator: userId,
-      sites: convertedCourse,
+      schedules: convertedSchedules,
     }], { session });
 
     await User.findByIdAndUpdate(
@@ -50,4 +54,30 @@ exports.addCourse = catchAsync(async (req, res, next) => {
     session.endSession();
     next(err);
   }
+});
+
+exports.getCourseById = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+
+  if (!mongoose.isValidObjectId(id)) {
+    // TODO: add error object creator
+    return next(new Error("404"));
+  }
+
+  const course = await Course.findById(id);
+
+  if (!course) {
+    // TODO: add error object creator
+    return next(new Error("404"));
+  }
+
+  course.schedules.length > 0 && course.populate("schedules.site");
+  course.messages.length > 0 && course.populate("messages");
+
+  await course.populate("creator").execPopulate();
+
+  return res.json({
+    ok: true,
+    data: course,
+  });
 });

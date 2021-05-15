@@ -10,7 +10,7 @@ const courseSchema = new mongoose.Schema({
     ref: "User",
   },
   name: String,
-  sites: [{
+  schedules: [{
     index: Number,
     site: {
       type: mongoose.Types.ObjectId,
