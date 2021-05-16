@@ -6,7 +6,10 @@ const messageSchema = new mongoose.Schema({
     ref: "User",
   },
   content: String,
-  location: [Number, Number],
+  location: {
+    latitude: Number,
+    longitude: Number,
+  },
 }, { timestamps: true });
 
 module.exports = mongoose.model("Message", messageSchema);

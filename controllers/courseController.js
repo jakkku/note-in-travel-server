@@ -52,23 +52,23 @@ exports.addCourse = catchAsync(async (req, res, next) => {
   } catch (err) {
     await session.abortTransaction();
     session.endSession();
+
+    err.message = "저장 중 오류 발생. 재시도 해주세요.";
     next(err);
   }
 });
 
 exports.getCourseById = catchAsync(async (req, res, next) => {
-  const { id } = req.params;
+  const { courseId } = req.params;
 
-  if (!mongoose.isValidObjectId(id)) {
-    // TODO: add error object creator
-    return next(new Error("404"));
-  }
+  const course = await Course.findById(courseId);
 
-  const course = await Course.findById(id);
-
+  // TODO: add error handler
   if (!course) {
-    // TODO: add error object creator
-    return next(new Error("404"));
+    const error = new Error("Not Found Page");
+
+    error.status = 404;
+    return next(error);
   }
 
   course.schedules.length > 0 && course.populate("schedules.site");
@@ -79,5 +79,34 @@ exports.getCourseById = catchAsync(async (req, res, next) => {
   return res.json({
     ok: true,
     data: course,
+  });
+});
+
+exports.saveMessage = catchAsync(async (req, res, next) => {
+  const { courseId } = req.params;
+  const { _id: userId } = req.user;
+  const { content, location } = req.body;
+
+  const course = await Course.findById(courseId);
+
+  // TODO: add error handler
+  if (!course) {
+    const error = new Error("Not Found Course");
+
+    error.status = 400;
+    return next(error);
+  }
+
+  const message = {
+    creator: userId,
+    content,
+    location,
+  };
+
+  await course.addMessage(message);
+
+  res.json({
+    ok: true,
+    data: message,
   });
 });
