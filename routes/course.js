@@ -6,11 +6,12 @@ const verifyParams = require("../middlewares/verifyParams");
 
 router
   .route("/")
-  .post(authenticateUser, courseController.addCourse);
+  .post(authenticateUser, courseController.addCourse)
+  .get(authenticateUser, courseController.getCourses);
 
 router
   .route("/:courseId")
-  .get(authenticateUser, verifyParams, courseController.getCourseById)
-  .post(authenticateUser, verifyParams, courseController.saveMessage);
+  .post(authenticateUser, verifyParams, courseController.saveMessage)
+  .get(authenticateUser, verifyParams, courseController.getCourseById);
 
 module.exports = router;

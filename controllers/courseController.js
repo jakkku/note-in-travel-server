@@ -7,7 +7,7 @@ const catchAsync = require("../utils/catchAsync");
 
 exports.addCourse = catchAsync(async (req, res, next) => {
   const { _id: userId } = req.user;
-  const { name, schedules } = req.body;
+  const { name, region: courseRegion, schedules } = req.body;
   const session = await mongoose.startSession();
 
   try {
@@ -33,6 +33,7 @@ exports.addCourse = catchAsync(async (req, res, next) => {
     const [newCourse] = await Course.create([{
       name,
       creator: userId,
+      region: courseRegion,
       schedules: convertedSchedules,
     }], { session });
 
@@ -45,7 +46,7 @@ exports.addCourse = catchAsync(async (req, res, next) => {
     await session.commitTransaction();
     session.endSession();
 
-    return res.json({
+    res.json({
       ok: true,
       data: newCourse,
     });
@@ -56,6 +57,15 @@ exports.addCourse = catchAsync(async (req, res, next) => {
     err.message = "저장 중 오류 발생. 재시도 해주세요.";
     next(err);
   }
+});
+
+exports.getCourses = catchAsync(async (req, res, next) => {
+  const courses = await Course.find().lean();
+
+  res.json({
+    ok: true,
+    data: courses,
+  });
 });
 
 exports.getCourseById = catchAsync(async (req, res, next) => {
@@ -76,7 +86,7 @@ exports.getCourseById = catchAsync(async (req, res, next) => {
 
   await course.populate("creator").execPopulate();
 
-  return res.json({
+  res.json({
     ok: true,
     data: course,
   });

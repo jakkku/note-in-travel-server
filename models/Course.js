@@ -11,6 +11,12 @@ const courseSchema = new mongoose.Schema({
     ref: "User",
   },
   name: String,
+  region: {
+    latitude: Number,
+    longitude: Number,
+    latitudeDelta: Number,
+    longitudeDelta: Number,
+  },
   schedules: [{
     index: Number,
     site: {
