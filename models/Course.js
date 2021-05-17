@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Message = require("./Message");
 
 const courseSchema = new mongoose.Schema({
   isShared: {
@@ -10,6 +11,12 @@ const courseSchema = new mongoose.Schema({
     ref: "User",
   },
   name: String,
+  region: {
+    latitude: Number,
+    longitude: Number,
+    latitudeDelta: Number,
+    longitudeDelta: Number,
+  },
   schedules: [{
     index: Number,
     site: {
@@ -26,5 +33,14 @@ const courseSchema = new mongoose.Schema({
     ref: "User",
   }],
 }, { timestamps: true });
+
+courseSchema.methods.addMessage = async function (message) {
+  const newMessage = await Message.create(message);
+
+  this.messages.push(newMessage._id);
+  await this.save();
+
+  return this;
+};
 
 module.exports = mongoose.model("Course", courseSchema);
