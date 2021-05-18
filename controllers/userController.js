@@ -35,14 +35,18 @@ exports.addFavoriteCourse = catchAsync(async (req, res, next) => {
     return next(error);
   }
 
-  await Course.findByIdAndUpdate(courseId, { $push: { favorites: user._id } });
+  const newCourse = await Course.findByIdAndUpdate(
+    courseId,
+    { $push: { favorites: user._id } },
+    { new: true },
+  );
 
   user.favoriteCourses.push(courseId);
   await user.save();
 
   res.json({
     ok: true,
-    data: courseId,
+    data: newCourse,
   });
 });
 
@@ -59,13 +63,17 @@ exports.deleteFavoriteCourse = catchAsync(async (req, res, next) => {
     return next(error);
   }
 
-  await Course.findByIdAndUpdate(courseId, { $pull: { favorites: user._id } });
+  const newCourse = await Course.findByIdAndUpdate(
+    courseId,
+    { $pull: { favorites: user._id } },
+    { new: true },
+  );
 
   user.favoriteCourses.pull(courseId);
   await user.save();
 
   res.json({
     ok: true,
-    data: courseId,
+    data: newCourse,
   });
 });
