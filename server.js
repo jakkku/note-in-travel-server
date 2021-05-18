@@ -11,6 +11,7 @@ const deserialize = require("./middlewares/deserialize");
 
 const db = require("./config/db");
 const auth = require("./routes/auth");
+const user = require("./routes/user");
 const course = require("./routes/course");
 
 const app = express();
@@ -26,6 +27,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(deserialize);
 
 app.use("/auth", auth);
+app.use("/user", user);
 app.use("/course", course);
 
 app.use((req, res, next) => {
