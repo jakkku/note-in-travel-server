@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const Course = require("../models/Course");
+const Message = require("../models/Message");
 const Site = require("../models/Site");
 const User = require("../models/User");
 const catchAsync = require("../utils/catchAsync");
@@ -107,16 +108,17 @@ exports.saveMessage = catchAsync(async (req, res, next) => {
     return next(error);
   }
 
-  const message = {
+  const newMessage = await Message.create({
     creator: userId,
     content,
     location,
-  };
+  });
 
-  await course.addMessage(message);
+  course.messages.push(newMessage._id);
+  await course.save();
 
   res.json({
     ok: true,
-    data: message,
+    data: newMessage,
   });
 });
