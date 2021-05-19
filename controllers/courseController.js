@@ -14,23 +14,7 @@ exports.addCourse = catchAsync(async (req, res, next) => {
   try {
     session.startTransaction();
 
-    const convertedSchedules = await Promise.all(schedules.map(async ({ index, site }) => {
-      const {
-        fullName,
-        shortName,
-        region,
-      } = site;
-      let siteInDB = await Site.findOne({ fullName }, null, { session });
-
-      if (siteInDB) {
-        return { index, site: siteInDB._id };
-      }
-
-      [siteInDB] = await Site.create([{ fullName, shortName, region }], { session });
-
-      return { index, site: siteInDB._id };
-    }));
-
+    const convertedSchedules = schedules.map(({ index, site }) => ({ index, site: site._id }));
     const [newCourse] = await Course.create([{
       name,
       creator: userId,
