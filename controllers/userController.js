@@ -41,6 +41,11 @@ exports.addFavoriteCourse = catchAsync(async (req, res, next) => {
     { new: true },
   );
 
+  newCourse.schedules.length > 0 && newCourse.populate("schedules.site");
+  newCourse.messages.length > 0 && newCourse.populate("messages");
+
+  await newCourse.populate("creator").execPopulate();
+
   user.favoriteCourses.push(courseId);
   await user.save();
 
@@ -68,6 +73,11 @@ exports.deleteFavoriteCourse = catchAsync(async (req, res, next) => {
     { $pull: { favorites: user._id } },
     { new: true },
   );
+
+  newCourse.schedules.length > 0 && newCourse.populate("schedules.site");
+  newCourse.messages.length > 0 && newCourse.populate("messages");
+
+  await newCourse.populate("creator").execPopulate();
 
   user.favoriteCourses.pull(courseId);
   await user.save();
