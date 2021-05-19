@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const Site = require("../models/Site");
 const Course = require("../models/Course");
 
 const catchAsync = require("../utils/catchAsync");
@@ -85,5 +86,51 @@ exports.deleteFavoriteCourse = catchAsync(async (req, res, next) => {
   res.json({
     ok: true,
     data: newCourse,
+  });
+});
+
+exports.addFavoriteSite = catchAsync(async (req, res, next) => {
+  const { user } = req;
+  const { siteId } = req.params;
+
+  const site = await Site.findById(siteId);
+  const isBookmarked = user.favoriteSites.includes(siteId);
+
+  if (isBookmarked) {
+    const error = new Error("이미 등록되어 있습니다.");
+
+    error.status = 400;
+    return next(error);
+  }
+
+  user.favoriteSites.push(siteId);
+  await user.save();
+
+  res.json({
+    ok: true,
+    data: site,
+  });
+});
+
+exports.deleteFavoriteSite = catchAsync(async (req, res, next) => {
+  const { user } = req;
+  const { siteId } = req.params;
+
+  const site = await Site.findById(siteId);
+  const isBookmarked = user.favoriteSites.includes(siteId);
+
+  if (!isBookmarked) {
+    const error = new Error("좋아요 목록에 존재하지 않습니다.");
+
+    error.status = 400;
+    return next(error);
+  }
+
+  user.favoriteSites.pull(siteId);
+  await user.save();
+
+  res.json({
+    ok: true,
+    data: site,
   });
 });
