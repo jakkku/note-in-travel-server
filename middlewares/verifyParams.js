@@ -1,14 +1,13 @@
 const mongoose = require("mongoose");
 
+const AppError = require("../utils/AppError");
+
 module.exports = (req, res, next) => {
   const params = Object.values(req.params);
-  const invalid = params.find((param) => !mongoose.isValidObjectId(param));
+  const isInvalid = params.find((param) => !mongoose.isValidObjectId(param));
 
-  if (invalid) {
-    const error = new Error("Not Found Page");
-
-    error.status = 404;
-    return next(error);
+  if (isInvalid) {
+    return next(new AppError("잘못된 파라미터입니다.", 404));
   }
 
   next();

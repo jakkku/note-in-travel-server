@@ -8,8 +8,13 @@ router
   .get(authenticateUser, userController.getUser);
 
 router
-  .route("/favoriteCourse/:courseId")
+  .route("/favoriteCourses/:courseId")
   .patch(authenticateUser, userController.addFavoriteCourse)
   .delete(authenticateUser, userController.deleteFavoriteCourse);
+
+router
+  .route("/favoriteSites/:siteId")
+  .patch(authenticateUser, userController.addFavoriteSite)
+  .delete(authenticateUser, userController.deleteFavoriteSite);
 
 module.exports = router;
