@@ -2,9 +2,9 @@ const mongoose = require("mongoose");
 
 const Course = require("../models/Course");
 const Message = require("../models/Message");
-const Site = require("../models/Site");
 const User = require("../models/User");
 const catchAsync = require("../utils/catchAsync");
+const AppError = require("../utils/AppError");
 
 exports.addCourse = catchAsync(async (req, res, next) => {
   const { _id: userId } = req.user;
@@ -39,8 +39,7 @@ exports.addCourse = catchAsync(async (req, res, next) => {
     await session.abortTransaction();
     session.endSession();
 
-    err.message = "저장 중 오류 발생. 재시도 해주세요.";
-    next(err);
+    next(new AppError("저장 중 오류 발생. 재시도 해주세요.", 500));
   }
 });
 
@@ -58,12 +57,8 @@ exports.getCourseById = catchAsync(async (req, res, next) => {
 
   const course = await Course.findById(courseId);
 
-  // TODO: add error handler
   if (!course) {
-    const error = new Error("Not Found Page");
-
-    error.status = 404;
-    return next(error);
+    return next(new AppError("잘못된 파라미터입니다.", 404));
   }
 
   course.schedules.length > 0 && course.populate("schedules.site");
@@ -84,12 +79,8 @@ exports.saveMessage = catchAsync(async (req, res, next) => {
 
   const course = await Course.findById(courseId);
 
-  // TODO: add error handler
   if (!course) {
-    const error = new Error("Not Found Course");
-
-    error.status = 400;
-    return next(error);
+    return next(new AppError("잘못된 파라미터입니다.", 404));
   }
 
   const newMessage = await Message.create({

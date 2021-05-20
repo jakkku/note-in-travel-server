@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const Site = require("../models/Site");
 const Course = require("../models/Course");
 
+const AppError = require("../utils/AppError");
 const catchAsync = require("../utils/catchAsync");
 
 exports.getUser = catchAsync(async (req, res, next) => {
@@ -14,8 +15,11 @@ exports.getUser = catchAsync(async (req, res, next) => {
     // { expiresIn: "6h" },
   );
 
-  await user.populate("myCourses").execPopulate();
-  await user.populate("favoriteCourses").execPopulate();
+  await user
+    .populate("myCourses")
+    .populate("favoriteCourses")
+    .populate("favoriteSites")
+    .execPopulate();
 
   res.json({
     ok: true,
@@ -30,10 +34,7 @@ exports.addFavoriteCourse = catchAsync(async (req, res, next) => {
   const isBookmarked = user.favoriteCourses.includes(courseId);
 
   if (isBookmarked) {
-    const error = new Error("이미 등록되어 있습니다.");
-
-    error.status = 400;
-    return next(error);
+    return next(new AppError("이미 등록되어 있습니다.", 400));
   }
 
   const newCourse = await Course.findByIdAndUpdate(
@@ -63,10 +64,7 @@ exports.deleteFavoriteCourse = catchAsync(async (req, res, next) => {
   const isBookmarked = user.favoriteCourses.includes(courseId);
 
   if (!isBookmarked) {
-    const error = new Error("좋아요 목록에 존재하지 않습니다.");
-
-    error.status = 400;
-    return next(error);
+    return next(new AppError("좋아요 목록에 존재하지 않습니다.", 400));
   }
 
   const newCourse = await Course.findByIdAndUpdate(
@@ -97,10 +95,7 @@ exports.addFavoriteSite = catchAsync(async (req, res, next) => {
   const isBookmarked = user.favoriteSites.includes(siteId);
 
   if (isBookmarked) {
-    const error = new Error("이미 등록되어 있습니다.");
-
-    error.status = 400;
-    return next(error);
+    return next(new AppError("이미 등록되어 있습니다.", 400));
   }
 
   user.favoriteSites.push(siteId);
@@ -120,10 +115,7 @@ exports.deleteFavoriteSite = catchAsync(async (req, res, next) => {
   const isBookmarked = user.favoriteSites.includes(siteId);
 
   if (!isBookmarked) {
-    const error = new Error("좋아요 목록에 존재하지 않습니다.");
-
-    error.status = 400;
-    return next(error);
+    return next(new AppError("좋아요 목록에 존재하지 않습니다.", 400));
   }
 
   user.favoriteSites.pull(siteId);

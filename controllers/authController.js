@@ -19,8 +19,11 @@ exports.login = catchAsync(async (req, res, next) => {
     // { expiresIn: "6h" },
   );
 
-  await user.populate("myCourses").execPopulate();
-  await user.populate("favoriteCourses").execPopulate();
+  await user
+    .populate("myCourses")
+    .populate("favoriteCourses")
+    .populate("favoriteSites")
+    .execPopulate();
 
   res.json({
     ok: true,

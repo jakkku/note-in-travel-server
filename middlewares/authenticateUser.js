@@ -1,9 +1,8 @@
+const AppError = require("../utils/AppError");
+
 module.exports = (req, res, next) => {
   if (!req.user) {
-    const error = new Error("로그인이 필요합니다.");
-    error.status = 401;
-
-    return next(error);
+    return next(new AppError("로그인이 필요합니다.", 401));
   }
 
   next();
