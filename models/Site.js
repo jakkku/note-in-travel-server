@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const siteSchema = new mongoose.Schema({
   fullName: {
     type: String,
+    index: true,
     required: [true, "full name is required"],
   },
   shortName: {
@@ -10,8 +11,14 @@ const siteSchema = new mongoose.Schema({
     required: [true, "short name is required"],
   },
   region: {
-    latitude: Number,
-    longitude: Number,
+    latitude: {
+      type: Number,
+      required: [true, "latitude is required"],
+    },
+    longitude: {
+      type: Number,
+      required: [true, "longitude is required"],
+    },
     latitudeDelta: Number,
     longitudeDelta: Number,
   },
