@@ -7,8 +7,14 @@ const messageSchema = new mongoose.Schema({
   },
   content: String,
   location: {
-    latitude: Number,
-    longitude: Number,
+    latitude: {
+      type: Number,
+      required: [true, "latitude is required"],
+    },
+    longitude: {
+      type: Number,
+      required: [true, "longitude is required"],
+    },
   },
 }, { timestamps: true });
 
