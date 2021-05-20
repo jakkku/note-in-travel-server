@@ -11,8 +11,14 @@ const courseSchema = new mongoose.Schema({
   },
   name: String,
   region: {
-    latitude: Number,
-    longitude: Number,
+    latitude: {
+      type: Number,
+      required: [true, "latitude is required"],
+    },
+    longitude: {
+      type: Number,
+      required: [true, "longitude is required"],
+    },
     latitudeDelta: Number,
     longitudeDelta: Number,
   },
